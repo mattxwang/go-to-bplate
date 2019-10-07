@@ -47,6 +47,10 @@ func getMenuItems(doc *goquery.Document) []MenuItem {
 	return answers
 }
 
+func getPageSchedule(doc *goquery.Document) string {
+	return doc.Find("#page-header").Text()
+}
+
 func getMatchingItems(parents []MenuItem, keywords []string) []MenuItem {
 	matches := []MenuItem{}
 	for _, parent := range parents {
@@ -60,12 +64,22 @@ func getMatchingItems(parents []MenuItem, keywords []string) []MenuItem {
 	return matches
 }
 
-func main() {
-	keywords := []string{"chicken"}
-	doc := makeHttpRequest("http://menu.dining.ucla.edu/Menus")
+func printMatchesForMeal(meal string, keywords []string){
+	fmt.Println("==========")
+	doc := makeHttpRequest("http://menu.dining.ucla.edu/Menus/" + meal)
+	title := getPageSchedule(doc)
 	items := getMenuItems(doc)
 	matches := getMatchingItems(items, keywords)
+	fmt.Println(title)
+	fmt.Println("-------")
 	for _, match := range matches {
 		fmt.Println(match.Name + " at " + match.Location)
 	}
+}
+
+func main() {
+	keywords := []string{"chicken"}
+	printMatchesForMeal("Breakfast", keywords)
+	printMatchesForMeal("Lunch", keywords)
+	printMatchesForMeal("Dinner", keywords)
 }
