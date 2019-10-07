@@ -27,14 +27,31 @@ func getMenuItems(doc *goquery.Document) []string {
 	answers := []string{}
 	doc.Find(".menu-item").Each(func(i int, s *goquery.Selection) {
 		item := s.Find(".recipelink")
-		answers = append(answers,item.Text())
+		// linkLoc, _ := item.Attr("href")
+		//if exists {
+			// fmt.Println(linkLoc)
+			answers = append(answers, strings.TrimSpace(item.Text()))
+		//}
 	})
 	return answers
 }
 
+func getMatchingItems(parent []string, keywords []string) []string {
+	matches := []string{}
+	for _, item := range parent {
+        for _, keyword := range keywords {
+			if strings.Contains(strings.ToLower(item), strings.ToLower(keyword)){
+				matches = append(matches, item)
+			}
+		}
+	}
+	return matches
+}
+
 func main() {
-	// keywords := []string{"chicken"}
+	keywords := []string{"chicken"}
 	doc := makeHttpRequest("http://menu.dining.ucla.edu/Menus")
 	items := getMenuItems(doc)
-	fmt.Println(strings.Join(items, ", "))
+	matches := getMatchingItems(items, keywords)
+	fmt.Println(strings.Join(matches, ", "))
 }
