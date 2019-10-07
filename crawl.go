@@ -8,8 +8,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type Document struct {}
-
 type MenuItem struct {
 	Name string
 	Location string
