@@ -10,6 +10,11 @@ import (
 
 type Document struct {}
 
+type MenuItem struct {
+	Name string
+	Location string
+}
+
 func makeHttpRequest(url string) *goquery.Document {
 	res, err := http.Get(url)
 	if err != nil {
@@ -23,25 +28,32 @@ func makeHttpRequest(url string) *goquery.Document {
 	return doc
 }
 
-func getMenuItems(doc *goquery.Document) []string {
-	answers := []string{}
-	doc.Find(".menu-item").Each(func(i int, s *goquery.Selection) {
-		item := s.Find(".recipelink")
-		// linkLoc, _ := item.Attr("href")
-		//if exists {
-			// fmt.Println(linkLoc)
-			answers = append(answers, strings.TrimSpace(item.Text()))
-		//}
+func getMenuItems(doc *goquery.Document) []MenuItem {
+	answers := []MenuItem{}
+	doc.Find(".menu-block").Each(func(i int, block *goquery.Selection){
+		location := block.Find(".col-header").Text()
+		if location == "FEAST at Rieber" {
+			location = "Feast"
+		}
+		block.Find(".menu-item").Each(func(j int, link *goquery.Selection) {
+			name := strings.TrimSpace(link.Find(".recipelink").Text())
+			item := MenuItem { 
+				Name: name,
+				Location: location,
+			}
+			answers = append(answers, item)
+		})
 	})
 	return answers
 }
 
-func getMatchingItems(parent []string, keywords []string) []string {
-	matches := []string{}
-	for _, item := range parent {
+func getMatchingItems(parents []MenuItem, keywords []string) []MenuItem {
+	matches := []MenuItem{}
+	for _, parent := range parents {
+		parentName := strings.ToLower(parent.Name)
         for _, keyword := range keywords {
-			if strings.Contains(strings.ToLower(item), strings.ToLower(keyword)){
-				matches = append(matches, item)
+			if strings.Contains(parentName, strings.ToLower(keyword)){
+				matches = append(matches, parent)
 			}
 		}
 	}
@@ -53,5 +65,7 @@ func main() {
 	doc := makeHttpRequest("http://menu.dining.ucla.edu/Menus")
 	items := getMenuItems(doc)
 	matches := getMatchingItems(items, keywords)
-	fmt.Println(strings.Join(matches, ", "))
+	for _, match := range matches {
+		fmt.Println(match.Name + " at " + match.Location)
+	}
 }
