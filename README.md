@@ -6,6 +6,7 @@ go-based web crawler/API for parsing UCLA dining data! lots more work to do, inc
 
 ```
 $ go get github.com/PuerkitoBio/goquery
+$ go build
 ...
-$ go run crawl.go
+$ ./go-to-bplate -keywords chicken -xfilters Gluten
 ```

@@ -43,7 +43,7 @@ func getItemDietaryInfo(menuItem *goquery.Selection) []string{
 				case "APNT":
 					dietInfo = append(dietInfo,"Peanuts")
 				case "ATNT":
-					dietInfo = append(dietInfo,"Tree Nuts")
+					dietInfo = append(dietInfo,"TreeNuts")
 				case "AWHT":
 					dietInfo = append(dietInfo,"Wheat")
 				case "AGTN":
@@ -61,7 +61,7 @@ func getItemDietaryInfo(menuItem *goquery.Selection) []string{
 				case "HAL":
 					dietInfo = append(dietInfo,"Halal")
 				case "LC":
-					dietInfo = append(dietInfo,"Low Carbon Footprint")
+					dietInfo = append(dietInfo,"LowCarbonFootprint")
 				}
 			}
 		})
@@ -100,7 +100,7 @@ func getPageSchedule(doc *goquery.Document) string {
 	return doc.Find("#page-header").Text()
 }
 
-func searchItemsByKeyword(parents []MenuItem, keywords []string) []MenuItem {
+func filterItemsByKeyword(parents []MenuItem, keywords []string) []MenuItem {
 	matches := []MenuItem{}
 	for _, parent := range parents {
 		parentName := strings.ToLower(parent.Name)
@@ -114,12 +114,40 @@ func searchItemsByKeyword(parents []MenuItem, keywords []string) []MenuItem {
 	return matches
 }
 
-func printMatchesForMeal(date string, meal string, keywords []string){
+func filterItemsByDietaryInfo(parents []MenuItem, filters []string) []MenuItem {
+	matches := []MenuItem{}
+	for _, parent := range parents {
+		if len(intersection(parent.DietaryInfo, filters)) > 0 {
+			matches = append(matches, parent)
+		}
+	}
+	return matches
+}
+
+func xfilterItemsByDietaryInfo(parents []MenuItem, filters []string) []MenuItem {
+	matches := []MenuItem{}
+	for _, parent := range parents {
+		if len(intersection(parent.DietaryInfo, filters)) == 0 {
+			matches = append(matches, parent)
+		}
+	}
+	return matches
+}
+
+func printMatchesForMeal(date string, meal string, keywords []string, filters []string, xfilters []string) {
 	fmt.Println("==========")
 	doc := makeHttpRequest("http://menu.dining.ucla.edu/Menus/" + date + "/" + meal)
 	title := getPageSchedule(doc)
-	items := getMenuItems(doc)
-	matches := searchItemsByKeyword(items, keywords)
+	matches := getMenuItems(doc)
+	if len(keywords) > 0 {
+		matches = filterItemsByKeyword(matches, keywords)
+	}
+	if len(filters) > 0 {
+		matches = filterItemsByDietaryInfo(matches, filters)
+	}
+	if len(xfilters) > 0 {
+		matches = xfilterItemsByDietaryInfo(matches, xfilters)
+	}
 	fmt.Println(title)
 	fmt.Println("-------")
 	for _, match := range matches {
