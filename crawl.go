@@ -8,27 +8,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type DietaryInformation struct {
-	Vegetarian bool
-	Vegan bool
-	Peanuts bool 
-	TreeNuts bool 
-	Wheat bool 
-	Gluten bool 
-	Soy bool
-	Dairy bool
-	Eggs bool
-	Shellfish bool
-	Fish bool
-	Halal bool
-	LowCarbon bool
-}
-
 type MenuItem struct {
 	Name string
 	RecipeLink string
 	Location string
-	DietaryInfo DietaryInformation
+	DietaryInfo []string
 }
 
 func makeHttpRequest(url string) *goquery.Document {
@@ -44,22 +28,8 @@ func makeHttpRequest(url string) *goquery.Document {
 	return doc
 }
 
-func getItemDietaryInfo(menuItem *goquery.Selection) DietaryInformation{
-	dietInfo := DietaryInformation {
-		Vegetarian: false,
-		Vegan: false,
-		Peanuts: false,
-		TreeNuts: false,
-		Wheat: false,
-		Gluten: false,
-		Soy: false,
-		Dairy: false,
-		Eggs: false,
-		Shellfish: false,
-		Fish: false,
-		Halal: false,
-		LowCarbon: false,
-	}
+func getItemDietaryInfo(menuItem *goquery.Selection) []string{
+	dietInfo := []string{}
 	// note: could also use .tooltip-target-wrapper
 	menuItem.Find(".item-description").Each(func(i int, itemDescription *goquery.Selection){
 		itemDescription.Find("img.webcode-16px").Each(func(j int, dietaryImage *goquery.Selection) {
@@ -67,31 +37,31 @@ func getItemDietaryInfo(menuItem *goquery.Selection) DietaryInformation{
 			if exists {
 				switch infoType {
 				case "V":
-					dietInfo.Vegetarian = true 
+					dietInfo = append(dietInfo,"Vegetarian")
 				case "VG":
-					dietInfo.Vegan = true 
+					dietInfo = append(dietInfo,"Vegan")
 				case "APNT":
-					dietInfo.Peanuts = true 
+					dietInfo = append(dietInfo,"Peanuts")
 				case "ATNT":
-					dietInfo.TreeNuts = true 
+					dietInfo = append(dietInfo,"Tree Nuts")
 				case "AWHT":
-					dietInfo.Wheat = true 
+					dietInfo = append(dietInfo,"Wheat")
 				case "AGTN":
-					dietInfo.Gluten = true 
+					dietInfo = append(dietInfo,"Gluten")
 				case "ASOY":
-					dietInfo.Soy = true 
+					dietInfo = append(dietInfo,"Soy")
 				case "AMLK":
-					dietInfo.Dairy = true
+					dietInfo = append(dietInfo,"Dairy")
 				case "AEGG":
-					dietInfo.Eggs = true
+					dietInfo = append(dietInfo,"Eggs")
 				case "ACSF":
-					dietInfo.Shellfish = true 
+					dietInfo = append(dietInfo,"Shellfish")
 				case "AFSH":
-					dietInfo.Fish = true
+					dietInfo = append(dietInfo,"Fish")
 				case "HAL":
-					dietInfo.Halal = true
+					dietInfo = append(dietInfo,"Halal")
 				case "LC":
-					dietInfo.LowCarbon = true
+					dietInfo = append(dietInfo,"Low Carbon Footprint")
 				}
 			}
 		})
@@ -154,20 +124,10 @@ func printMatchesForMeal(date string, meal string, keywords []string){
 	fmt.Println("-------")
 	for _, match := range matches {
 		fmtString := match.Name + " at " + match.Location 
-		if match.DietaryInfo.Vegetarian {
-			fmtString = fmtString + " (VG)"
-		}
-		if match.DietaryInfo.Vegan {
-			fmtString = fmtString + " (V)"
+		for _, dietaryInfo := range match.DietaryInfo {
+			fmtString = fmtString + " (" + dietaryInfo + ")"
 		}
 		fmtString = fmtString + " (" + match.RecipeLink + ")"
 		fmt.Println(fmtString)
 	}
-}
-
-func main() {
-	keywords := []string{"chicken", "tacos", "avocado"}
-	printMatchesForMeal("Today", "Breakfast", keywords)
-	printMatchesForMeal("Today","Lunch", keywords)
-	printMatchesForMeal("Today","Dinner", keywords)
 }
