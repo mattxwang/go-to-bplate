@@ -23,6 +23,13 @@ type MealData struct {
 	Items []MenuItem
 }
 
+type DayData struct {
+	Date string
+	Breakfast *MealData
+	Lunch *MealData
+	Dinner *MealData
+}
+
 func makeHttpRequest(url string) *goquery.Document {
 	res, err := http.Get(url)
 	if err != nil {
@@ -156,7 +163,7 @@ func filterMenuItems(parents []MenuItem, keywords []string, filters []string, xf
 	return matches
 }
 
-func newMealData(title string, date string, items []MenuItem) *MealData{
+func newMealData(title string, date string, items []MenuItem) *MealData {
 	m := new(MealData)
 	m.Title = title 
 	m.Date = date
@@ -164,12 +171,28 @@ func newMealData(title string, date string, items []MenuItem) *MealData{
 	return m
 }
 
-func fetchMealData(date string, meal string, keywords []string, filters []string, xfilters []string) *MealData{
+func fetchMealData(date string, meal string, keywords []string, filters []string, xfilters []string) *MealData {
 	doc := makeHttpRequest(diningURL + date + "/" + meal)
 	title := getPageSchedule(doc)
 	items := getMenuItems(doc)
 	matches := filterMenuItems(items, keywords, filters, xfilters)
 	return newMealData(title, date, matches)
+}
+
+func newDayData(date string, breakfast *MealData, lunch *MealData, dinner *MealData) *DayData {
+	d := new(DayData)
+	d.Date = date 
+	d.Breakfast = breakfast 
+	d.Lunch = lunch
+	d.Dinner = dinner
+	return d
+}
+
+func fetchDayData(date string, keywords []string, filters []string, xfilters []string) *DayData {
+	breakfast := fetchMealData(date, "Breakfast", keywords, filters, xfilters)
+	lunch := fetchMealData(date, "Lunch", keywords, filters, xfilters)
+	dinner := fetchMealData(date, "Dinner", keywords, filters, xfilters)
+	return newDayData(date, breakfast, lunch, dinner)
 }
 
 func serializeMealData(mealData *MealData) {

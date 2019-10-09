@@ -3,8 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"net/http"
 	"strings"
 )
+
+const portNum = "4242"
 
 func main() {
 	serverModePtr := flag.Bool("s", false, "runs in API webserver mode if true")
@@ -15,6 +19,12 @@ func main() {
 	flag.Parse()
 	if *serverModePtr {
 		fmt.Println("Server mode")
+		server := NewResponseServer()
+
+		fmt.Println("Serving on http://localhost:" + portNum)
+		if err := http.ListenAndServe(":" + portNum, server); err != nil {
+			log.Fatalf("could not listen on port 4242 %v", err)
+		}
 	} else {
 		keywords := strings.Split(*keywordsPtr, ",")
 		filters := strings.Split(*filtersPtr, ",")
@@ -25,11 +35,9 @@ func main() {
 		if strings.TrimSpace(*xfiltersPtr) == "" {
 			xfilters = []string{}
 		}
-		breakfastMealData := fetchMealData(*datePtr, "Breakfast", keywords, filters, xfilters)
-		lunchMealData := fetchMealData(*datePtr, "Lunch", keywords, filters, xfilters)
-		dinnerMealData := fetchMealData(*datePtr, "Dinner", keywords, filters, xfilters)
-		serializeMealData(breakfastMealData)
-		serializeMealData(lunchMealData)
-		serializeMealData(dinnerMealData)
+		dayData := fetchDayData(*datePtr, keywords, filters, xfilters)
+		serializeMealData(dayData.Breakfast)
+		serializeMealData(dayData.Lunch)
+		serializeMealData(dayData.Dinner)
 	}
 }
