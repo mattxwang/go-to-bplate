@@ -2,8 +2,9 @@ package main
 
 import (
 	"encoding/json"
-    // "fmt"
-    "net/http"
+    "fmt"
+	"net/http"
+	"time"
 )
 
 const jsonContentType = "application/json"
@@ -22,6 +23,8 @@ func NewResponseServer() *ResponseServer {
 
 func (p *ResponseServer) todayHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
-	dayData := fetchDayData("Today", []string{}, []string{}, []string{})
+	dateString := time.Now().Format("2006-01-02")
+	fmt.Println("Getting all meals for " + dateString)
+	dayData := fetchDayData(dateString, []string{}, []string{}, []string{})
     json.NewEncoder(w).Encode(dayData)
 }
