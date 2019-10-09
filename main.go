@@ -25,8 +25,11 @@ func main() {
 		if strings.TrimSpace(*xfiltersPtr) == "" {
 			xfilters = []string{}
 		}
-		printMatchesForMeal(*datePtr, "Breakfast", keywords, filters, xfilters)
-		printMatchesForMeal(*datePtr,"Lunch", keywords, filters, xfilters)
-		printMatchesForMeal(*datePtr,"Dinner", keywords, filters, xfilters)
+		breakfastMealData := fetchMealData(*datePtr, "Breakfast", keywords, filters, xfilters)
+		lunchMealData := fetchMealData(*datePtr, "Lunch", keywords, filters, xfilters)
+		dinnerMealData := fetchMealData(*datePtr, "Dinner", keywords, filters, xfilters)
+		serializeMealData(breakfastMealData)
+		serializeMealData(lunchMealData)
+		serializeMealData(dinnerMealData)
 	}
 }

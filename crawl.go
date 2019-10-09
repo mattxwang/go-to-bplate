@@ -8,11 +8,19 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+const diningURL = "http://menu.dining.ucla.edu/Menus/"
+
 type MenuItem struct {
 	Name string
 	RecipeLink string
 	Location string
 	DietaryInfo []string
+}
+
+type MealData struct {
+	Title string
+	Date string
+	Items []MenuItem
 }
 
 func makeHttpRequest(url string) *goquery.Document {
@@ -134,11 +142,8 @@ func xfilterItemsByDietaryInfo(parents []MenuItem, filters []string) []MenuItem 
 	return matches
 }
 
-func printMatchesForMeal(date string, meal string, keywords []string, filters []string, xfilters []string) {
-	fmt.Println("==========")
-	doc := makeHttpRequest("http://menu.dining.ucla.edu/Menus/" + date + "/" + meal)
-	title := getPageSchedule(doc)
-	matches := getMenuItems(doc)
+func filterMenuItems(parents []MenuItem, keywords []string, filters []string, xfilters []string) []MenuItem {
+	matches := parents 
 	if len(keywords) > 0 {
 		matches = filterItemsByKeyword(matches, keywords)
 	}
@@ -148,14 +153,36 @@ func printMatchesForMeal(date string, meal string, keywords []string, filters []
 	if len(xfilters) > 0 {
 		matches = xfilterItemsByDietaryInfo(matches, xfilters)
 	}
-	fmt.Println(title)
+	return matches
+}
+
+func newMealData(title string, date string, items []MenuItem) *MealData{
+	m := new(MealData)
+	m.Title = title 
+	m.Date = date
+	m.Items = items
+	return m
+}
+
+func fetchMealData(date string, meal string, keywords []string, filters []string, xfilters []string) *MealData{
+	doc := makeHttpRequest(diningURL + date + "/" + meal)
+	title := getPageSchedule(doc)
+	items := getMenuItems(doc)
+	matches := filterMenuItems(items, keywords, filters, xfilters)
+	return newMealData(title, date, matches)
+}
+
+func serializeMealData(mealData *MealData) {
+	meal := *mealData
+	fmt.Println("==========")
+	fmt.Println(meal.Title)
 	fmt.Println("-------")
-	for _, match := range matches {
-		fmtString := match.Name + " at " + match.Location 
-		for _, dietaryInfo := range match.DietaryInfo {
+	for _, item := range meal.Items {
+		fmtString := item.Name + " at " + item.Location 
+		for _, dietaryInfo := range item.DietaryInfo {
 			fmtString = fmtString + " (" + dietaryInfo + ")"
 		}
-		fmtString = fmtString + " (" + match.RecipeLink + ")"
+		fmtString = fmtString + " (" + item.RecipeLink + ")"
 		fmt.Println(fmtString)
 	}
 }
