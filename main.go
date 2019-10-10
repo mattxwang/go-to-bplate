@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -18,11 +17,11 @@ func main() {
 	xfiltersPtr := flag.String("xfilters", "", "comma-delimited (exclusive) filters for dietary information")
 	flag.Parse()
 	if *serverModePtr {
-		fmt.Println("Server mode")
+		log.Println("Server mode")
 		server := NewResponseServer()
 
-		fmt.Println("Serving on http://localhost:" + portNum)
-		if err := http.ListenAndServe(":" + portNum, server); err != nil {
+		log.Println("Serving on http://localhost:" + portNum)
+		if err := http.ListenAndServe(":"+portNum, server); err != nil {
 			log.Fatalf("could not listen on port 4242 %v", err)
 		}
 	} else {

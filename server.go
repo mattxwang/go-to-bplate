@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-    "fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -27,23 +27,24 @@ func NewResponseServer() *ResponseServer {
 	return s
 }
 
-func NewMenuHit(data *DayData) *MenuHit{
+func NewMenuHit(data *DayData) *MenuHit {
 	m := new(MenuHit)
-	m.data = data 
+	m.data = data
 	return m
 }
 
 func getMenuHit(p *ResponseServer, dateString string) *MenuHit {
+	log.Println("Getting all meals for " + dateString)
 	hit, exists := p.cache[dateString]
 	if !exists {
-		fmt.Println("Cache miss, retrieving from server")
+		log.Println("Cache miss, retrieving from server")
 		newDayData := fetchDayData(dateString, []string{}, []string{}, []string{})
-		fmt.Println("Server responded, caching result for future")
+		log.Println("Server responded, caching result for future")
 		newMenuHit := NewMenuHit(newDayData)
 		p.cache[dateString] = newMenuHit
 		hit = newMenuHit
 	} else {
-		fmt.Println("Cache hit!")
+		log.Println("Cache hit!")
 	}
 	return hit
 }
@@ -51,7 +52,6 @@ func getMenuHit(p *ResponseServer, dateString string) *MenuHit {
 func (p *ResponseServer) todayHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	dateString := time.Now().Format("2006-01-02")
-	fmt.Println("Getting all meals for " + dateString)
 	hit := getMenuHit(p, dateString)
-    json.NewEncoder(w).Encode(hit.data)
+	json.NewEncoder(w).Encode(hit.data)
 }
