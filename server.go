@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -51,11 +52,37 @@ func getMenuHit(p *ResponseServer, dateString string, searchOptions *SearchOptio
 	return hit
 }
 
+func populateSearchOptions(r *http.Request) *SearchOptions {
+	searchOptions := new(SearchOptions)
+	keywordsQuery, exists := r.URL.Query()["keywords"]
+	if exists && len(keywordsQuery[0]) > 0 {
+		keywords := strings.Split(keywordsQuery[0], ",")
+		if strings.TrimSpace(keywordsQuery[0]) != "" {
+			searchOptions.keywords = keywords
+		}
+	}
+	filtersQuery, exists := r.URL.Query()["filters"]
+	if exists && len(filtersQuery[0]) > 0 {
+		filters := strings.Split(filtersQuery[0], ",")
+		if strings.TrimSpace(filtersQuery[0]) != "" {
+			searchOptions.filters = filters
+		}
+	}
+	xfiltersQuery, exists := r.URL.Query()["xfilters"]
+	if exists && len(xfiltersQuery[0]) > 0 {
+		xfilters := strings.Split(xfiltersQuery[0], ",")
+		if strings.TrimSpace(xfiltersQuery[0]) != "" {
+			searchOptions.xfilters = xfilters
+		}
+	}
+	return searchOptions
+}
+
 func (p *ResponseServer) todayHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	currentTime := time.Now()
 	dateString := currentTime.Format("2006-01-02")
-	searchOptions := new(SearchOptions)
+	searchOptions := populateSearchOptions(r)
 	hit := getMenuHit(p, dateString, searchOptions)
 	json.NewEncoder(w).Encode(hit.data)
 }
@@ -64,7 +91,7 @@ func (p *ResponseServer) tomorrowHandler(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("content-type", jsonContentType)
 	currentTime := time.Now()
 	dateString := currentTime.AddDate(0, 0, 1).Format("2006-01-02")
-	searchOptions := new(SearchOptions)
+	searchOptions := populateSearchOptions(r)
 	hit := getMenuHit(p, dateString, searchOptions)
 	json.NewEncoder(w).Encode(hit.data)
 }
@@ -72,7 +99,7 @@ func (p *ResponseServer) tomorrowHandler(w http.ResponseWriter, r *http.Request)
 func (p *ResponseServer) genericDateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	dateString := r.URL.Path[len("/date/"):]
-	searchOptions := new(SearchOptions)
+	searchOptions := populateSearchOptions(r)
 	hit := getMenuHit(p, dateString, searchOptions)
 	json.NewEncoder(w).Encode(hit.data)
 }
