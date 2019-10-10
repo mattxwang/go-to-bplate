@@ -23,6 +23,8 @@ func NewResponseServer() *ResponseServer {
 	s.cache = map[string]*MenuHit{}
 	router := http.NewServeMux()
 	router.Handle("/today", http.HandlerFunc(s.todayHandler))
+	router.Handle("/tomorrow", http.HandlerFunc(s.tomorrowHandler))
+	router.Handle("/date/", http.HandlerFunc(s.genericDateHandler))
 	s.Handler = router
 	return s
 }
@@ -51,7 +53,23 @@ func getMenuHit(p *ResponseServer, dateString string) *MenuHit {
 
 func (p *ResponseServer) todayHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
-	dateString := time.Now().Format("2006-01-02")
+	currentTime := time.Now()
+	dateString := currentTime.Format("2006-01-02")
+	hit := getMenuHit(p, dateString)
+	json.NewEncoder(w).Encode(hit.data)
+}
+
+func (p *ResponseServer) tomorrowHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", jsonContentType)
+	currentTime := time.Now()
+	dateString := currentTime.AddDate(0, 0, 1).Format("2006-01-02")
+	hit := getMenuHit(p, dateString)
+	json.NewEncoder(w).Encode(hit.data)
+}
+
+func (p *ResponseServer) genericDateHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", jsonContentType)
+	dateString := r.URL.Path[len("/date/"):]
 	hit := getMenuHit(p, dateString)
 	json.NewEncoder(w).Encode(hit.data)
 }
