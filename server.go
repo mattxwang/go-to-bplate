@@ -35,12 +35,12 @@ func NewMenuHit(data *DayData) *MenuHit {
 	return m
 }
 
-func getMenuHit(p *ResponseServer, dateString string) *MenuHit {
+func getMenuHit(p *ResponseServer, dateString string, searchOptions *SearchOptions) *MenuHit {
 	log.Println("Getting all meals for " + dateString)
 	hit, exists := p.cache[dateString]
 	if !exists {
 		log.Println("Cache miss, retrieving from server")
-		newDayData := fetchDayData(dateString, []string{}, []string{}, []string{})
+		newDayData := fetchDayData(dateString, searchOptions)
 		log.Println("Server responded, caching result for future")
 		newMenuHit := NewMenuHit(newDayData)
 		p.cache[dateString] = newMenuHit
@@ -55,7 +55,8 @@ func (p *ResponseServer) todayHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	currentTime := time.Now()
 	dateString := currentTime.Format("2006-01-02")
-	hit := getMenuHit(p, dateString)
+	searchOptions := new(SearchOptions)
+	hit := getMenuHit(p, dateString, searchOptions)
 	json.NewEncoder(w).Encode(hit.data)
 }
 
@@ -63,13 +64,15 @@ func (p *ResponseServer) tomorrowHandler(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("content-type", jsonContentType)
 	currentTime := time.Now()
 	dateString := currentTime.AddDate(0, 0, 1).Format("2006-01-02")
-	hit := getMenuHit(p, dateString)
+	searchOptions := new(SearchOptions)
+	hit := getMenuHit(p, dateString, searchOptions)
 	json.NewEncoder(w).Encode(hit.data)
 }
 
 func (p *ResponseServer) genericDateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	dateString := r.URL.Path[len("/date/"):]
-	hit := getMenuHit(p, dateString)
+	searchOptions := new(SearchOptions)
+	hit := getMenuHit(p, dateString, searchOptions)
 	json.NewEncoder(w).Encode(hit.data)
 }

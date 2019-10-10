@@ -34,7 +34,12 @@ func main() {
 		if strings.TrimSpace(*xfiltersPtr) == "" {
 			xfilters = []string{}
 		}
-		dayData := fetchDayData(*datePtr, keywords, filters, xfilters)
+		searchOptions := SearchOptions{
+			keywords: keywords,
+			filters:  filters,
+			xfilters: xfilters,
+		}
+		dayData := fetchDayData(*datePtr, &searchOptions)
 		serializeMealData(dayData.Breakfast)
 		serializeMealData(dayData.Lunch)
 		serializeMealData(dayData.Dinner)

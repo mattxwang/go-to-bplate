@@ -33,6 +33,12 @@ type DayData struct {
 	Dinner    *MealData
 }
 
+type SearchOptions struct {
+	keywords []string
+	filters  []string
+	xfilters []string
+}
+
 func makeHttpRequest(url string) *goquery.Document {
 	res, err := http.Get(url)
 	if err != nil {
@@ -152,16 +158,16 @@ func xfilterItemsByDietaryInfo(parents []MenuItem, filters []string) []MenuItem 
 	return matches
 }
 
-func filterMenuItems(parents []MenuItem, keywords []string, filters []string, xfilters []string) []MenuItem {
+func filterMenuItems(parents []MenuItem, searchOptions *SearchOptions) []MenuItem {
 	matches := parents
-	if len(keywords) > 0 {
-		matches = filterItemsByKeyword(matches, keywords)
+	if len(searchOptions.keywords) > 0 {
+		matches = filterItemsByKeyword(matches, searchOptions.keywords)
 	}
-	if len(filters) > 0 {
-		matches = filterItemsByDietaryInfo(matches, filters)
+	if len(searchOptions.filters) > 0 {
+		matches = filterItemsByDietaryInfo(matches, searchOptions.filters)
 	}
-	if len(xfilters) > 0 {
-		matches = xfilterItemsByDietaryInfo(matches, xfilters)
+	if len(searchOptions.xfilters) > 0 {
+		matches = xfilterItemsByDietaryInfo(matches, searchOptions.xfilters)
 	}
 	return matches
 }
@@ -174,11 +180,11 @@ func newMealData(title string, date string, items []MenuItem) *MealData {
 	return m
 }
 
-func fetchMealData(date string, meal string, keywords []string, filters []string, xfilters []string) *MealData {
+func fetchMealData(date string, meal string, searchOptions *SearchOptions) *MealData {
 	doc := makeHttpRequest(diningURL + date + "/" + meal)
 	title := getPageSchedule(doc)
 	items := getMenuItems(doc)
-	matches := filterMenuItems(items, keywords, filters, xfilters)
+	matches := filterMenuItems(items, searchOptions)
 	return newMealData(title, date, matches)
 }
 
@@ -192,10 +198,10 @@ func newDayData(date string, breakfast *MealData, lunch *MealData, dinner *MealD
 	return d
 }
 
-func fetchDayData(date string, keywords []string, filters []string, xfilters []string) *DayData {
-	breakfast := fetchMealData(date, "Breakfast", keywords, filters, xfilters)
-	lunch := fetchMealData(date, "Lunch", keywords, filters, xfilters)
-	dinner := fetchMealData(date, "Dinner", keywords, filters, xfilters)
+func fetchDayData(date string, searchOptions *SearchOptions) *DayData {
+	breakfast := fetchMealData(date, "Breakfast", searchOptions)
+	lunch := fetchMealData(date, "Lunch", searchOptions)
+	dinner := fetchMealData(date, "Dinner", searchOptions)
 	return newDayData(date, breakfast, lunch, dinner)
 }
 
