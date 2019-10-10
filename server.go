@@ -15,7 +15,6 @@ type ResponseServer struct {
 }
 
 type MenuHit struct {
-	//time Time 
 	data *DayData
 }
 
@@ -34,10 +33,7 @@ func NewMenuHit(data *DayData) *MenuHit{
 	return m
 }
 
-func (p *ResponseServer) todayHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", jsonContentType)
-	dateString := time.Now().Format("2006-01-02")
-	fmt.Println("Getting all meals for " + dateString)
+func getMenuHit(p *ResponseServer, dateString string) *MenuHit {
 	hit, exists := p.cache[dateString]
 	if !exists {
 		fmt.Println("Cache miss, retrieving from server")
@@ -49,6 +45,13 @@ func (p *ResponseServer) todayHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Println("Cache hit!")
 	}
-	dayData := hit.data
-    json.NewEncoder(w).Encode(dayData)
+	return hit
+}
+
+func (p *ResponseServer) todayHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", jsonContentType)
+	dateString := time.Now().Format("2006-01-02")
+	fmt.Println("Getting all meals for " + dateString)
+	hit := getMenuHit(p, dateString)
+    json.NewEncoder(w).Encode(hit.data)
 }

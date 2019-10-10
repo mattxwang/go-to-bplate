@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -25,6 +26,7 @@ type MealData struct {
 
 type DayData struct {
 	Date string
+	Time time.Time
 	Breakfast *MealData
 	Lunch *MealData
 	Dinner *MealData
@@ -182,6 +184,7 @@ func fetchMealData(date string, meal string, keywords []string, filters []string
 func newDayData(date string, breakfast *MealData, lunch *MealData, dinner *MealData) *DayData {
 	d := new(DayData)
 	d.Date = date 
+	d.Time = time.Now()
 	d.Breakfast = breakfast 
 	d.Lunch = lunch
 	d.Dinner = dinner
