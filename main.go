@@ -39,9 +39,10 @@ func main() {
 			filters:  filters,
 			xfilters: xfilters,
 		}
-		dayData := fetchDayData(*datePtr, &searchOptions)
-		serializeMealData(dayData.Breakfast)
-		serializeMealData(dayData.Lunch)
-		serializeMealData(dayData.Dinner)
+		dayData := fetchDayData(*datePtr)
+		filteredData := filterDayData(dayData, &searchOptions)
+		serializeMealData(filteredData.Breakfast)
+		serializeMealData(filteredData.Lunch)
+		serializeMealData(filteredData.Dinner)
 	}
 }

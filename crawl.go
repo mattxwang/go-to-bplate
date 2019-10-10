@@ -21,7 +21,6 @@ type MenuItem struct {
 
 type MealData struct {
 	Title string
-	Date  string
 	Items []MenuItem
 }
 
@@ -172,37 +171,57 @@ func filterMenuItems(parents []MenuItem, searchOptions *SearchOptions) []MenuIte
 	return matches
 }
 
-func newMealData(title string, date string, items []MenuItem) *MealData {
+func newMealData(title string, items []MenuItem) *MealData {
 	m := new(MealData)
 	m.Title = title
-	m.Date = date
 	m.Items = items
 	return m
 }
 
-func fetchMealData(date string, meal string, searchOptions *SearchOptions) *MealData {
+func fetchMealData(date string, meal string) *MealData {
 	doc := makeHttpRequest(diningURL + date + "/" + meal)
 	title := getPageSchedule(doc)
 	items := getMenuItems(doc)
-	matches := filterMenuItems(items, searchOptions)
-	return newMealData(title, date, matches)
+	return newMealData(title, items)
 }
 
-func newDayData(date string, breakfast *MealData, lunch *MealData, dinner *MealData) *DayData {
+func newDayData(date string, time time.Time, breakfast *MealData, lunch *MealData, dinner *MealData) *DayData {
 	d := new(DayData)
 	d.Date = date
-	d.Time = time.Now()
+	d.Time = time
 	d.Breakfast = breakfast
 	d.Lunch = lunch
 	d.Dinner = dinner
 	return d
 }
 
-func fetchDayData(date string, searchOptions *SearchOptions) *DayData {
-	breakfast := fetchMealData(date, "Breakfast", searchOptions)
-	lunch := fetchMealData(date, "Lunch", searchOptions)
-	dinner := fetchMealData(date, "Dinner", searchOptions)
-	return newDayData(date, breakfast, lunch, dinner)
+func fetchDayData(date string) *DayData {
+	breakfast := fetchMealData(date, "Breakfast")
+	lunch := fetchMealData(date, "Lunch")
+	dinner := fetchMealData(date, "Dinner")
+	return newDayData(date, time.Now(), breakfast, lunch, dinner)
+}
+
+func filterDayData(dayData *DayData, searchOptions *SearchOptions) *DayData {
+	breakfast := newMealData(
+		dayData.Breakfast.Title,
+		filterMenuItems(dayData.Breakfast.Items, searchOptions),
+	)
+	lunch := newMealData(
+		dayData.Lunch.Title,
+		filterMenuItems(dayData.Lunch.Items, searchOptions),
+	)
+	dinner := newMealData(
+		dayData.Dinner.Title,
+		filterMenuItems(dayData.Dinner.Items, searchOptions),
+	)
+	return newDayData(
+		dayData.Date,
+		dayData.Time,
+		breakfast,
+		lunch,
+		dinner,
+	)
 }
 
 func serializeMealData(mealData *MealData) {
