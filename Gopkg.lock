@@ -19,6 +19,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:174e9284d0cc4caba0f06e90a6c93254f6c70326f81f0ae355632fd56dd48d9c"
+  name = "github.com/jasonlvhit/gocron"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "57f89394836a3cf351337b15507fd5a8d76b694e"
+
+[[projects]]
+  branch = "master"
   digest = "1:0be3fc4126c5a734c67e77fb3befd681f9efe0d0774efd31bae8f5826238ca36"
   name = "golang.org/x/net"
   packages = [
@@ -31,6 +39,9 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/PuerkitoBio/goquery"]
+  input-imports = [
+    "github.com/PuerkitoBio/goquery",
+    "github.com/jasonlvhit/gocron",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

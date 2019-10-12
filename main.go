@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/jasonlvhit/gocron"
 )
 
 const portStr = ":4242"
@@ -27,9 +29,20 @@ func main() {
 	flag.Parse()
 	if !(*cliModePtr) {
 		log.Println("Server mode")
+
 		server := NewResponseServer()
 		port := getPort()
 		log.Println("Serving on http://localhost" + port)
+
+		updateCache(server)
+		// gocron.Every(1).Minute().Do(updateCache, server)
+		// gocron.Every(5).Minutes().Do(updateCache, server)
+		gocron.Every(1).Day().At("5:00").Do(updateCache, server)
+		go func() {
+			log.Println("Starting secondary gocron thread")
+			<-gocron.Start()
+		}()
+
 		if err := http.ListenAndServe(port, server); err != nil {
 			log.Fatalf("could not listen on port 4242 %v", err)
 		}

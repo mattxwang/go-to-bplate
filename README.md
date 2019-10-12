@@ -12,9 +12,9 @@ roadmap:
 - [x] basic HTTP server
 - [x] caching
 - [ ] on-disk cache (JSON)
-- [ ] deploy to Heroku!
-- [ ] cache-flushing and auto-population on specific times
-- [ ] cron job-like polling
+- [x] deploy to Heroku!
+- [x] cache-flushing and auto-population on specific times
+- [x] cron job-like polling
 - [ ] hooking up to a frontend (website, app, chrome extension)
 - [ ] docs
 - [ ] bot integration/webhooks

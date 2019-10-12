@@ -52,6 +52,25 @@ func getMenuHit(p *ResponseServer, dateString string) *MenuHit {
 	return hit
 }
 
+func clearCache(p *ResponseServer) {
+	p.cache = map[string]*MenuHit{}
+	log.Println("Cache reset.")
+}
+
+func fetchNextWeekMenu(p *ResponseServer) {
+	currentTime := time.Now()
+	for i := 0; i < 7; i++ {
+		dateString := currentTime.AddDate(0, 0, i).Format("2006-01-02")
+		getMenuHit(p, dateString)
+	}
+}
+
+func updateCache(p *ResponseServer) {
+	log.Println("Updating the cache!")
+	clearCache(p)
+	fetchNextWeekMenu(p)
+}
+
 func populateSearchOptions(r *http.Request) *SearchOptions {
 	searchOptions := new(SearchOptions)
 	keywordsQuery, exists := r.URL.Query()["keywords"]
