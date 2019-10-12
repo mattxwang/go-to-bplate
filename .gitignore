@@ -11,5 +11,8 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# stuff from dep 
+vendor/
+
 # output of go build
 go-to-bplate
