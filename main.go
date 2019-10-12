@@ -30,7 +30,7 @@ func main() {
 		server := NewResponseServer()
 		port := getPort()
 		log.Println("Serving on http://localhost" + port)
-		if err := http.ListenAndServe(":"+port, server); err != nil {
+		if err := http.ListenAndServe(port, server); err != nil {
 			log.Fatalf("could not listen on port 4242 %v", err)
 		}
 	} else {
