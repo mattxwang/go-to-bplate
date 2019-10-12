@@ -30,9 +30,17 @@ and other things i need to do
 
 ## dev setup & basic use
 
-setup environment
+setup environment with dep
 
 ```
+$ dep ensure
+$ go build
+```
+
+or manually:
+
+```
+$ go get "github.com/jasonlvhit/gocron"
 $ go get github.com/PuerkitoBio/goquery
 $ go build
 ```
