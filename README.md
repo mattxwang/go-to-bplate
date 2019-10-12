@@ -40,7 +40,7 @@ $ go build
 API server usage
 
 ```
-$ ./go-to-bplate -s
+$ ./go-to-bplate
 $  curl "http://localhost:4242/date/2019-10-09?filters=Vegetarian&xfilters=Gluten&keywords=Cheese"
 ```
 
@@ -93,7 +93,7 @@ response format (JSON)
 CLI (not recommended)
 
 ```
-$ ./go-to-bplate -keywords chicken -xfilters Gluten
+$ ./go-to-bplate -c -keywords chicken -xfilters Gluten
 ==========
 Breakfast Menu for Today, October 7, 2019
 -------
