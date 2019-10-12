@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-const portNum = "4242"
+const portStr = ":4242"
 
 func getPort() string {
 	p := os.Getenv("PORT")
 	if p != "" {
 		return ":" + p
 	}
-	return portNum
+	return portStr
 }
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 		log.Println("Server mode")
 		server := NewResponseServer()
 		port := getPort()
-		log.Println("Serving on http://localhost:" + port)
+		log.Println("Serving on http://localhost" + port)
 		if err := http.ListenAndServe(":"+port, server); err != nil {
 			log.Fatalf("could not listen on port 4242 %v", err)
 		}
