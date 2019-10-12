@@ -36,5 +36,5 @@
 [metadata.heroku]
   root-package = "github.com/malsf21/go-to-bplate"
   go-version = "go1.12"
-  ensure = "false"
+  ensure = "true"
   install = [ "./..." ]
