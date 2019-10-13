@@ -34,11 +34,12 @@ func main() {
 		port := getPort()
 		log.Println("Serving on http://localhost" + port)
 
-		updateCache(server)
 		// gocron.Every(1).Minute().Do(updateCache, server)
 		// gocron.Every(5).Minutes().Do(updateCache, server)
 		gocron.Every(1).Day().At("5:00").Do(updateCache, server)
 		go func() {
+			log.Println("Caching next seven days...")
+			updateCache(server)
 			log.Println("Starting secondary gocron thread")
 			<-gocron.Start()
 		}()
