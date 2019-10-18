@@ -1,5 +1,7 @@
 package main
 
+import "strings"
+
 func intersection(s1, s2 []string) (inter []string) {
 	hash := make(map[string]bool)
 	for _, e := range s1 {
@@ -23,4 +25,12 @@ func removeDups(elements []string) (nodups []string) {
 		}
 	}
 	return
+}
+
+func splitStringsByComma(input string) []string {
+	response := strings.Split(strings.TrimSpace(input), ",")
+	if response[0] != "" {
+		return response
+	}
+	return []string{}
 }

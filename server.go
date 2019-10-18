@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -73,26 +72,18 @@ func updateCache(p *ResponseServer) {
 
 func populateSearchOptions(r *http.Request) *SearchOptions {
 	searchOptions := new(SearchOptions)
+
 	keywordsQuery, exists := r.URL.Query()["keywords"]
 	if exists && len(keywordsQuery[0]) > 0 {
-		keywords := strings.Split(strings.TrimSpace(keywordsQuery[0]), ",")
-		if keywords[0] != "" {
-			searchOptions.keywords = keywords
-		}
+		searchOptions.keywords = splitStringsByComma(keywordsQuery[0])
 	}
 	filtersQuery, exists := r.URL.Query()["filters"]
 	if exists && len(filtersQuery[0]) > 0 {
-		filters := strings.Split(strings.TrimSpace(filtersQuery[0]), ",")
-		if filters[0] != "" {
-			searchOptions.filters = filters
-		}
+		searchOptions.filters = splitStringsByComma(filtersQuery[0])
 	}
 	xfiltersQuery, exists := r.URL.Query()["xfilters"]
 	if exists && len(xfiltersQuery[0]) > 0 {
-		xfilters := strings.Split(strings.TrimSpace(xfiltersQuery[0]), ",")
-		if xfilters[0] != "" {
-			searchOptions.xfilters = xfilters
-		}
+		searchOptions.xfilters = splitStringsByComma(xfiltersQuery[0])
 	}
 	return searchOptions
 }
