@@ -140,7 +140,7 @@ func filterItemsByKeyword(parents []MenuItem, keywords []string) []MenuItem {
 func filterItemsByDietaryInfo(parents []MenuItem, filters []string) []MenuItem {
 	matches := []MenuItem{}
 	for _, parent := range parents {
-		if len(intersection(parent.DietaryInfo, filters)) > 0 {
+		if len(insensitiveIntersection(parent.DietaryInfo, filters)) > 0 {
 			matches = append(matches, parent)
 		}
 	}
@@ -150,7 +150,7 @@ func filterItemsByDietaryInfo(parents []MenuItem, filters []string) []MenuItem {
 func xfilterItemsByDietaryInfo(parents []MenuItem, filters []string) []MenuItem {
 	matches := []MenuItem{}
 	for _, parent := range parents {
-		if len(intersection(parent.DietaryInfo, filters)) == 0 {
+		if len(insensitiveIntersection(parent.DietaryInfo, filters)) == 0 {
 			matches = append(matches, parent)
 		}
 	}

@@ -3,10 +3,12 @@
 `go-to-bplate` is a passion project I made to make the UCLA dining hall experience better. it's currently an API server that pulls data from the UCLA dining website and presents it in a more readable form, with caching, keyword search, and filtering by dietary needs (e.g. Vegan, Gluten free, etc.). it's very much a work in progress, so more's coming soon (including documentation)!
 
 features right now:
+
 * API server that pulls menu information by date; caches results in memory, performs keyword search and dietary filtering
 * CLI that pulls menu information by date, performs keyword search and dietary filtering
 
 roadmap:
+
 - [x] parse UCLA dining website!
 - [x] CLI
 - [x] basic HTTP server
@@ -21,7 +23,8 @@ roadmap:
 - [ ] real database?
 
 and other things i need to do
-* case-insensitive filtering and xfiltering
+
+* ~~case-insensitive filtering and xfiltering~~
 * polling take-out places
 * make things more efficient
 * explore options for nutrition facts/ingredients endpoints & data
@@ -32,14 +35,14 @@ and other things i need to do
 
 setup environment with dep
 
-```
+```sh
 $ dep ensure
 $ go build
 ```
 
 or manually:
 
-```
+```sh
 $ go get "github.com/jasonlvhit/gocron"
 $ go get github.com/PuerkitoBio/goquery
 $ go build
@@ -47,7 +50,7 @@ $ go build
 
 API server usage
 
-```
+```sh
 $ ./go-to-bplate
 $  curl "http://localhost:4242/date/2019-10-09?filters=Vegetarian&xfilters=Gluten&keywords=Cheese"
 ```
@@ -100,7 +103,7 @@ response format (JSON)
 
 CLI (not recommended)
 
-```
+```sh
 $ ./go-to-bplate -c -keywords chicken -xfilters Gluten
 ==========
 Breakfast Menu for Today, October 7, 2019
