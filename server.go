@@ -22,6 +22,7 @@ func NewResponseServer() *ResponseServer {
 	s := new(ResponseServer)
 	s.cache = map[string]*MenuHit{}
 	router := http.NewServeMux()
+	router.Handle("/", http.HandlerFunc(s.todayHandler))
 	router.Handle("/today", http.HandlerFunc(s.todayHandler))
 	router.Handle("/tomorrow", http.HandlerFunc(s.tomorrowHandler))
 	router.Handle("/date/", http.HandlerFunc(s.dateEndpointHandler))
